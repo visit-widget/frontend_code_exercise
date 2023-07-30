@@ -31,7 +31,7 @@ export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
   return (
     <View style={styles.bottomContainer} pointerEvents="box-none">
       <IconButton
-        testId="left-arrow"
+        testID="left-arrow"
         disabled={activeIndex === 0}
         onPress={onPrevious}
         style={styles.arrowContainer}
@@ -52,7 +52,7 @@ export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
       </View>
       <IconButton
         disabled={activeIndex === tutorialSlideCount - 1}
-        testId="right-arrow"
+        testID="right-arrow"
         onPress={onNext}
         style={styles.arrowContainer}
       >

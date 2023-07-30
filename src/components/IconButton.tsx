@@ -4,7 +4,7 @@ import { StyleProp, TouchableOpacity, ViewStyle } from "react-native";
 interface IconButtonProps {
   disabled?: boolean;
   onPress?: () => void;
-  testId?: string;
+  testID?: string;
   children: ReactNode;
   style: StyleProp<ViewStyle>;
 }
@@ -12,7 +12,7 @@ interface IconButtonProps {
 export const IconButton: React.FC<IconButtonProps> = ({
   disabled,
   onPress,
-  testId,
+  testID,
   children,
   style,
 }) => {
@@ -21,7 +21,7 @@ export const IconButton: React.FC<IconButtonProps> = ({
       disabled={disabled}
       style={[{ opacity: disabled ? 0.2 : 1 }, style]}
       onPress={onPress}
-      testID={testId}
+      testID={testID}
     >
       {children}
     </TouchableOpacity>
