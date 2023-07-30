@@ -41,7 +41,7 @@ const TutorialSlide: FunctionComponent<TutorialSlideProps> = ({
   );
 };
 
-interface TutorialSlideProps {
+export interface TutorialSlideProps {
   buttonLabel: string;
   color: string;
   description: string;
