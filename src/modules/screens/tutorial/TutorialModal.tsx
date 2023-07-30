@@ -1,7 +1,7 @@
 /* TODO: the coding exercise is refactoring this file as you see fit */
 
 import * as Animatable from "react-native-animatable";
-import * as color from "@constants/color";
+import * as COLOR from "@constants/color";
 import FullScreenModal from "@src/modules/modal_layout/FullScreenModal";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { ReactNode, useState } from "react";
@@ -36,7 +36,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({
         duration={300}
       >
         <LinearGradient
-          colors={[color.transparent, color.blackAlpha6]}
+          colors={[COLOR.transparent, COLOR.blackAlpha6]}
           locations={[0, 1.0]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0.5, y: 0 }}

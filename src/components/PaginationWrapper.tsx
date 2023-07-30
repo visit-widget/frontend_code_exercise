@@ -1,5 +1,5 @@
 import { Pagination } from "react-native-snap-carousel";
-import * as color from "../constants/color";
+import * as COLOR from "@constants/color";
 import React from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
 import { TutorialSlideType } from "@constants/types";
@@ -14,6 +14,12 @@ interface PaginationWrapperProps {
   onNext: () => void;
 }
 
+const { width: viewportWidth, height: viewportHeight } =
+  Dimensions.get("window");
+
+const isHeightSimilarToiPhoneOrSmaller = viewportHeight < 600;
+const dotWidth = 10;
+
 export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
   tutorialSlides,
   activeIndex,
@@ -22,8 +28,10 @@ export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
 }) => {
   const tutorialSlideCount = tutorialSlides.length;
   const dotHorizontalMargin = 2.5;
+  const dotTotalWidth = dotWidth + 18 * dotHorizontalMargin;
+  const reservedWidth = 140;
   const maxAllowed = Math.floor(
-    (viewportWidth - 120 - 20) / (dotWidth + 8 * 2 + 2 * dotHorizontalMargin)
+    (viewportWidth - reservedWidth) / dotTotalWidth
   );
   let dotsLength =
     maxAllowed < tutorialSlideCount ? maxAllowed : tutorialSlideCount;
@@ -43,8 +51,8 @@ export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
           dotContainerStyle={styles.dotContainerStyle}
           activeDotIndex={activeDotIndex}
           dotsLength={dotsLength}
-          dotColor={color.white}
-          inactiveDotColor={color.white}
+          dotColor={COLOR.white}
+          inactiveDotColor={COLOR.white}
           inactiveDotScale={1}
           inactiveDotOpacity={0.3}
           dotStyle={styles.dot}
@@ -62,17 +70,10 @@ export const PaginationWrapper: React.FC<PaginationWrapperProps> = ({
   );
 };
 
-const { width: viewportWidth, height: viewportHeight } =
-  Dimensions.get("window");
-
-const isHeightSimilarToiPhoneOrSmaller = viewportHeight < 600;
-
-const dotWidth = 10;
-
 const styles = StyleSheet.create({
   bottomContainer: {
-    height: viewportHeight * 0.1,
-    width: viewportWidth,
+    height: "10%",
+    width: "100%",
     position: "absolute",
     bottom: 0,
     flexDirection: "row",
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   paginationContainer: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: color.transparent,
+    backgroundColor: COLOR.transparent,
   },
   dot: {
     width: dotWidth,

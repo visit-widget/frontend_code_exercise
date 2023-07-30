@@ -1,4 +1,4 @@
-export const copy = {
+export const COPY = {
   en: {
     skip: "Skip",
   },
