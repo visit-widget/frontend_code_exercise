@@ -4,11 +4,12 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@navigation/*": ["src/navigation/*"],
+      "@lib/*": ["src/lib/*"],
       "@components/*": ["src/components/*"],
       "@screens/*": ["src/screens/*"],
       "@stores/*": ["src/stores/*"],
-      "@constants/*": ["src/constants/*"]
+      "@constants/*": ["src/constants/*"],
+      "@src/*": ["src/*"]
     }
   }
 }
