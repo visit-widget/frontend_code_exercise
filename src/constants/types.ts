@@ -1,4 +1,4 @@
-export type tutorialSlide = {
+export type TutorialSlideType = {
   backgroundColor: string;
   buttonLabel?: string;
   description?: string;
@@ -10,8 +10,8 @@ export type tutorialSlide = {
   promptForPushNotifications: boolean;
 };
 
-export type TutorialSlideType = {
-  tutorialSlides: Array<tutorialSlide>;
+export type TutorialSlidesType = {
+  tutorialSlides: Array<TutorialSlideType>;
   visible: boolean;
   onFirstTutorialSlideNextAction: () => void;
   onPrompt: (_a?: any, _b?: any, _c?: any) => void;

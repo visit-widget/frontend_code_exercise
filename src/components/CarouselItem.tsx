@@ -1,11 +1,10 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import TutorialSlide, {
-  TutorialSlideProps,
-} from "@src/modules/screens/tutorial/TutorialSlide";
+import TutorialSlide from "@src/modules/screens/tutorial/TutorialSlide";
+import { TutorialSlideType } from "@constants/types";
 
 interface CarouselItemProps {
-  item: TutorialSlideProps;
+  item: TutorialSlideType;
   index: number;
   color: string;
   slidesTotal: number;
@@ -23,12 +22,12 @@ export const CarouselItem: React.FC<CarouselItemProps> = ({
 }) => {
   return (
     <TutorialSlide
-      buttonLabel={item.buttonLabel}
+      buttonLabel={item.buttonLabel ?? ""}
       color={color}
-      description={item.description}
-      image1xUrl={item.image1xUrl}
-      image2xUrl={item.image2xUrl}
-      image3xUrl={item.image3xUrl}
+      description={item.description ?? ""}
+      image1xUrl={item.image1xUrl ?? ""}
+      image2xUrl={item.image2xUrl ?? ""}
+      image3xUrl={item.image3xUrl ?? ""}
       index={index}
       shouldClose={index === slidesTotal}
       name={item.name}
