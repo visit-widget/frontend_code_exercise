@@ -1,33 +1,31 @@
 /* TODO: the coding exercise is refactoring this file as you see fit */
 
-import * as Animatable from "react-native-animatable";
-import * as color from "../../../constants/color";
-import * as devices from "../../../constants/devices";
-import * as fontSizes from "../../../constants/fontSizes";
-import * as customPropTypes from "../../../constants/customPropTypes";
-import Carousel, { Pagination } from "react-native-snap-carousel";
-import FullScreenModal from "../../modal_layout/FullScreenModal";
-import { LinearGradient } from "expo-linear-gradient";
-import PropTypes from "prop-types";
-import React, { PureComponent } from "react";
-import StyledText from "../../controls/StyledText";
-import TutorialSlide from "./TutorialSlide";
-import currentDevice from "../../../lib/getDevice";
+import React, { useState, useRef } from 'react'
+import { connect } from 'react-redux'
 import {
-  Dimensions,
+  View,
   Image,
   StyleSheet,
+  Dimensions,
   TouchableOpacity,
-  View,
-} from "react-native";
-import { connect } from "react-redux";
+} from 'react-native'
+import Carousel, { Pagination } from 'react-native-snap-carousel'
+import { LinearGradient } from 'expo-linear-gradient'
+import PropTypes from 'prop-types'
+import * as color from '../../../constants/color'
+import * as devices from '../../../constants/devices'
+import * as fontSizes from '../../../constants/fontSizes'
+import * as customPropTypes from '../../../constants/customPropTypes'
+import currentDevice from '../../../lib/getDevice'
+import StyledText from '../../controls/StyledText'
+import TutorialSlide from './TutorialSlide'
+import FullScreenModal from '../../modal_layout/FullScreenModal'
 
 const { width: viewportWidth, height: viewportHeight } =
-  Dimensions.get("window");
-
-const dotWidth = 10;
-const dotHorizontalMargin = 2.5;
-const isHeightSimilarToiPhoneOrSmaller = viewportHeight < 600;
+  Dimensions.get('window')
+const dotWidth = 10
+const dotHorizontalMargin = 2.5
+const isHeightSimilarToiPhoneOrSmaller = viewportHeight < 600
 
 const styles = StyleSheet.create({
   container: {
@@ -35,7 +33,7 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     padding: devices.deviceSizes[currentDevice] === devices.SMALL ? 10 : 20,
-    position: "absolute",
+    position: 'absolute',
     top: 20,
     right: 0,
     backgroundColor: color.transparent,
@@ -47,24 +45,24 @@ const styles = StyleSheet.create({
   bottomContainer: {
     height: viewportHeight * 0.1,
     width: viewportWidth,
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   arrowPlaceHolder: {
     width: 60,
   },
   arrowContainer: {
     paddingHorizontal: 22,
-    backgroundColor: "red",
+    backgroundColor: 'red',
   },
   arrow: {
     width: 16,
     height: 40,
   },
   leftArrow: {
-    transform: [{ rotate: "180deg" }],
+    transform: [{ rotate: '180deg' }],
   },
   dot: {
     width: dotWidth,
@@ -74,183 +72,138 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     flex: 1,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: color.transparent,
   },
   dotContainerStyle: {
     width: dotWidth + 10,
   },
-});
+})
 
 const strings = {
-  skip: "Skip",
-};
+  skip: 'Skip',
+}
 
 const images = {
-  arrow: require("../../../../assets/images/arrow-right-white-big.png"),
-};
+  arrow: require('../../../../assets/images/arrow-right-white-big.png'),
+}
 
-const gradientColors = [color.transparent, color.blackAlpha6];
-const gradientLocations = [0, 1.0];
-const gradientStart = { x: 0.5, y: 0 };
-const gradientEnd = { x: 1, y: 1 };
+const gradientColors = [color.transparent, color.blackAlpha6]
+const gradientLocations = [0, 1.0]
+const gradientStart = { x: 0.5, y: 0 }
+const gradientEnd = { x: 1, y: 1 }
 
-export class Tutorial extends PureComponent {
-  static propTypes = {
-    tutorialSlides: PropTypes.arrayOf(customPropTypes.tutorialSlide).isRequired,
-    visible: PropTypes.bool.isRequired,
-    onFirstTutorialSlideNextAction: PropTypes.func.isRequired,
-    onPrompt: PropTypes.func.isRequired,
-  };
+interface TutorialProps {
+  tutorialSlides: (typeof customPropTypes.tutorialSlide)[]
+  visible: boolean
+  onFirstTutorialSlideNextAction: () => void
+  onPrompt: (
+    promptForLocationAccess: boolean,
+    promptForPushNotifications: boolean
+  ) => void
+}
 
-  static defaultProps = {
-    tutorialSlides: [],
-    visible: false,
-  };
+const Tutorial: React.FC<TutorialProps> = ({
+  tutorialSlides,
+  visible,
+  onFirstTutorialSlideNextAction,
+  onPrompt,
+}) => {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const carouselRef = useRef<typeof customPropTypes.tutorialSlide | null>(null)
+  const scrollingRef = useRef(false)
 
-  state = {
-    activeIndex: 0,
-  };
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    if (this.props.visible && !nextProps.visible) {
-      this._refs.carousel.snapToItem(0);
+  const handlePrevious = () => {
+    if (!scrollingRef.current && activeIndex > 0) {
+      scrollingRef.current = true
+      carouselRef.current?.snapToItem(activeIndex - 1)
+      setActiveIndex(activeIndex - 1)
     }
   }
 
-  _scrolling = false;
-
-  _refs = {};
-
-  _setCarouselRef = (r) => (this._refs.carousel = r);
-
-  _stoppedScrolling = () => (this._scrolling = false);
-
-  _setActiveIndex = (activeIndex) => {
-    if (activeIndex === this.state.activeIndex + 1) {
-      this.props.onPrompt(
-        this.props.tutorialSlides[this.state.activeIndex]
-          .promptForLocationAccess,
-        this.props.tutorialSlides[this.state.activeIndex]
-          .promptForPushNotifications
-      );
+  const handleNext = () => {
+    if (activeIndex === 0) {
+      onFirstTutorialSlideNextAction()
     }
-    this.setState({ activeIndex }, this._stoppedScrolling);
-  };
-
-  _onPrevious = () => {
-    if (!this._scrolling) {
-      this._scrolling = true;
-      this._refs.carousel.snapToItem(this.state.activeIndex - 1);
-      this._setActiveIndex(this.state.activeIndex - 1);
+    if (!scrollingRef.current && activeIndex < tutorialSlides.length - 1) {
+      scrollingRef.current = true
+      carouselRef.current?.snapToItem(activeIndex + 1)
+      setActiveIndex(activeIndex + 1)
     }
-  };
+  }
 
-  _onNext = () => {
-    if (this.state.activeIndex === 0) {
-      this.props.onFirstTutorialSlideNextAction();
-    }
-    if (!this._scrolling) {
-      this._scrolling = true;
-      this._refs.carousel.snapToItem(this.state.activeIndex + 1);
-      this._setActiveIndex(this.state.activeIndex + 1);
-    }
-  };
+  const handleScrollEnd = () => {
+    scrollingRef.current = false
+  }
 
-  _onSkipTutorial = () => this.props.onPrompt(true, true, true);
-
-  _renderItem = ({ item, index }) => (
-    <TutorialSlide
-      buttonLabel={item.buttonLabel}
-      color={item.backgroundColor}
-      description={item.description}
-      image1xUrl={item.image1xUrl}
-      image2xUrl={item.image2xUrl}
-      image3xUrl={item.image3xUrl}
-      index={index}
-      shouldClose={index === this.props.tutorialSlides.length - 1}
-      name={item.name}
-      promptForLocationAccess={item.promptForLocationAccess}
-      promptForPushNotifications={item.promptForPushNotifications}
-      onPrompt={this.props.onPrompt}
-      onNext={this._onNext}
-      showConsentText={index === 0}
-    />
-  );
-
-  _renderSkipButton = () => (
+  const renderSkipButton = () => (
     <TouchableOpacity
       style={styles.skipButton}
-      onPress={this._onSkipTutorial}
-      testID="skip-tutorial-button"
-    >
+      onPress={() => onPrompt(true, true)}
+      testID='skip-tutorial-button'>
       <StyledText style={styles.skipButtonText}>{strings.skip}</StyledText>
     </TouchableOpacity>
-  );
+  )
 
-  _renderLeftArrow = () => {
-    if (this.state.activeIndex === 0) {
-      return <View style={styles.arrowPlaceHolder} />;
+  const renderLeftArrow = () => {
+    if (activeIndex === 0) {
+      return <View style={styles.arrowPlaceHolder} />
     }
     return (
       <View>
         <TouchableOpacity
           style={styles.arrowContainer}
-          onPress={this._onPrevious}
-          testID="left-arrow"
-        >
+          onPress={handlePrevious}
+          testID='left-arrow'>
           <Image
             source={images.arrow}
             style={[styles.arrow, styles.leftArrow]}
-            resizeMode="contain"
+            resizeMode='contain'
           />
         </TouchableOpacity>
       </View>
-    );
-  };
+    )
+  }
 
-  _renderRightArrow = () => {
-    if (this.state.activeIndex === this.props.tutorialSlides.length - 1) {
-      return <View style={styles.arrowPlaceHolder} />;
+  const renderRightArrow = () => {
+    if (activeIndex === tutorialSlides.length - 1) {
+      return <View style={styles.arrowPlaceHolder} />
     }
     return (
       <View>
-        <TouchableOpacity style={styles.arrowContainer} onPress={this._onNext}>
+        <TouchableOpacity style={styles.arrowContainer} onPress={handleNext}>
           <Image
             source={images.arrow}
             style={styles.arrow}
-            resizeMode="contain"
-            testID="left-arrow"
+            resizeMode='contain'
+            testID='right-arrow'
           />
         </TouchableOpacity>
       </View>
-    );
-  };
+    )
+  }
 
-  _renderBottom = () => {
-    if (!this.props.visible) {
-      return null;
+  const renderBottom = () => {
+    if (!visible) {
+      return null
     }
     const maxAllowed = Math.floor(
       (viewportWidth - 120 - 20) / (dotWidth + 8 * 2 + 2 * dotHorizontalMargin)
-    );
+    )
     let dotsLength =
-      maxAllowed < this.props.tutorialSlides.length
-        ? maxAllowed
-        : this.props.tutorialSlides.length;
-    const activeDotIndex = this.state.activeIndex % dotsLength;
+      maxAllowed < tutorialSlides.length ? maxAllowed : tutorialSlides.length
+    const activeDotIndex = activeIndex % dotsLength
     if (
-      this.props.tutorialSlides.length % maxAllowed !== 0 &&
-      this.state.activeIndex >=
-        this.props.tutorialSlides.length -
-          (this.props.tutorialSlides.length % maxAllowed)
+      tutorialSlides.length % maxAllowed !== 0 &&
+      activeIndex >=
+        tutorialSlides.length - (tutorialSlides.length % maxAllowed)
     ) {
-      dotsLength = this.props.tutorialSlides.length % maxAllowed;
+      dotsLength = tutorialSlides.length % maxAllowed
     }
     return (
-      <View style={styles.bottomContainer} pointerEvents="box-none">
-        {this._renderLeftArrow()}
-        <View style={styles.paginationContainer} pointerEvents="none">
+      <View style={styles.bottomContainer} pointerEvents='box-none'>
+        {renderLeftArrow()}
+        <View style={styles.paginationContainer} pointerEvents='none'>
           <Pagination
             dotContainerStyle={styles.dotContainerStyle}
             activeDotIndex={activeDotIndex}
@@ -262,59 +215,63 @@ export class Tutorial extends PureComponent {
             dotStyle={styles.dot}
           />
         </View>
-        {this._renderRightArrow()}
+        {renderRightArrow()}
       </View>
-    );
-  };
-
-  render() {
-    const backgroundColor =
-      this.props.tutorialSlides.length > 0
-        ? {
-            backgroundColor:
-              this.props.tutorialSlides[this.state.activeIndex].backgroundColor,
-          }
-        : null;
-    return (
-      <FullScreenModal
-        visible={this.props.visible}
-        side="bottom"
-        style={styles.container}
-        duration={250}
-      >
-        <Animatable.View
-          style={[backgroundColor, { flex: 1 }]}
-          transition="backgroundColor"
-          duration={300}
-        >
-          <LinearGradient
-            colors={gradientColors}
-            locations={gradientLocations}
-            style={StyleSheet.absoluteFill}
-            start={gradientStart}
-            end={gradientEnd}
-          />
-          <Carousel
-            ref={this._setCarouselRef}
-            data={this.props.tutorialSlides}
-            renderItem={this._renderItem}
-            sliderWidth={viewportWidth}
-            itemWidth={viewportWidth}
-            onSnapToItem={this._setActiveIndex}
-            scrollEnabled={this.state.activeIndex === 0 ? false : true}
-          />
-          {this.state.activeIndex !== 0 ? this._renderSkipButton() : null}
-          {this._renderBottom()}
-        </Animatable.View>
-      </FullScreenModal>
-    );
+    )
   }
+
+  const backgroundColor =
+    tutorialSlides.length > 0
+      ? { backgroundColor: tutorialSlides[activeIndex].backgroundColor }
+      : null
+
+  return (
+    <FullScreenModal
+      visible={visible}
+      side='bottom'
+      style={styles.container}
+      duration={250}>
+      <View style={[backgroundColor, { flex: 1 }]}>
+        <LinearGradient
+          colors={gradientColors}
+          locations={gradientLocations}
+          style={StyleSheet.absoluteFill}
+          start={gradientStart}
+          end={gradientEnd}
+        />
+        <Carousel
+          ref={(ref) => (carouselRef.current = ref)}
+          data={tutorialSlides}
+          renderItem={renderItem}
+          sliderWidth={viewportWidth}
+          itemWidth={viewportWidth}
+          onSnapToItem={setActiveIndex}
+          onScrollEndDrag={handleScrollEnd}
+          scrollEnabled={activeIndex === 0 ? false : true}
+        />
+        {activeIndex !== 0 ? renderSkipButton() : null}
+        {renderBottom()}
+      </View>
+    </FullScreenModal>
+  )
+}
+
+Tutorial.propTypes = {
+  tutorialSlides: PropTypes.arrayOf(customPropTypes.tutorialSlide).isRequired,
+  visible: PropTypes.bool.isRequired,
+  onFirstTutorialSlideNextAction: PropTypes.func.isRequired,
+  onPrompt: PropTypes.func.isRequired,
+}
+
+Tutorial.defaultProps = {
+  tutorialSlides: [],
+  visible: false,
 }
 
 const mapStateToProps = (state: any) => {
   return {
     visible: state.tutorial.isVisible,
-  };
-};
+  }
+}
 
-export default connect(mapStateToProps)(Tutorial);
+export default connect(mapStateToProps)(Tutorial)
