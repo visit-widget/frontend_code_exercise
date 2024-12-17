@@ -19,7 +19,7 @@ the subsequent technical interview.
 Please refactor `src/modules/screens/tutorial/Tutorial.tsx` as you see fit. The goal of this exercise is for us
 to gain an understanding of your personal coding style. Any other files exist only so the app can run, albeit not
 pretty or user friendly, for the benefit of the applicant if it might prove helpful. The exercise
-will be analyzed purely from a review of the code and _not_ it running or how it looks in browser/simulator.
+will be analyzed purely from a review of the code and _not_ it running or how it looks in the browser/simulator.
 
 ## Submission
 
